@@ -94,11 +94,21 @@ async function chooseFile() {
   if (typeof picked === "string") await openPath(picked);
 }
 
+/**
+ * URL `asset:` d'un fichier local, avec les `/` du chemin conservés.
+ * (`convertFileSrc` encode tout le chemin, `/` compris : le navigateur ne retrouve alors
+ * plus le dossier du fichier et les images / CSS relatifs de la page HTML sont cassés.)
+ */
+function assetUrl(path: string): string {
+  const base = convertFileSrc(""); // ex. "asset://localhost/" ou "http://asset.localhost/"
+  return base + path.replace(/\\/g, "/").split("/").map(encodeURIComponent).join("/");
+}
+
 async function openHtml(path: string) {
   closePdf();
   await invoke("allow_dir", { path });
   setMode("html");
-  els.frame.src = convertFileSrc(path);
+  els.frame.src = assetUrl(path);
 }
 
 async function openPdf(path: string) {
