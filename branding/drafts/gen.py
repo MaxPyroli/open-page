@@ -30,6 +30,9 @@ VARIANTS = [
     ("violet", "Violet · 288°", "#7b70c5", "#574e90", "#8fd3ff"),
     ("orange", "Orange brûlé · 69°", "#ae6e05", "#7d4d00", "#a8e6a1"),
     ("cyan", "Cyan · 219°", "#0a8ca9", "#046378", "#cdbcff"),
+    ("vert", "Vert · 146°", "#44924e", "#2b6833", "#ffb27a"),
+    ("rose", "Rose · 356°", "#b85b80", "#853d5a", "#8fd3ff"),
+    ("graphite", "Graphite · hors roue (exception à valider)", "#2f3542", "#1a1e27", "#8fd3ff"),
 ]
 for slug, _, bg, ink, back in VARIANTS:
     open(f"icone-{slug}.svg", "w").write(icon(bg, ink, back))
@@ -43,8 +46,8 @@ for slug, label, bg, ink, back in VARIANTS:
       <div class="row dark">{imgs(96)}{imgs(48)}{imgs(32)}</div></section>'''
 open("planche.html", "w").write(f'''<!doctype html><meta charset="utf-8"><style>
 body{{margin:0;padding:28px;background:#f4f5f7;font:15px system-ui,sans-serif;color:#1c1e22}}
-.w{{display:flex;gap:28px}} section{{flex:1}} h2{{margin:0 0 2px;font-size:17px}} .c{{margin:0 0 12px;color:#6b7280;font-size:13px}}
+.w{{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}} h2{{margin:0 0 2px;font-size:17px}} .c{{margin:0 0 12px;color:#6b7280;font-size:13px}}
 .big{{background:#fff;border-radius:16px;padding:20px;display:grid;place-content:center;margin-bottom:12px}}
 .row{{display:flex;align-items:flex-end;gap:18px;padding:14px 16px;border-radius:14px;margin-bottom:10px}}
 .light{{background:#fff}} .dark{{background:#17181b}}
-</style><h1 style="margin:0 0 18px;font-size:20px">Icône — 3 couleurs de la réserve (96 / 48 / 32 px, clair et sombre)</h1><div class="w">{cols}</div>''')
+</style><h1 style="margin:0 0 18px;font-size:20px">Icône — 5 couleurs de la réserve + 1 hors roue (96 / 48 / 32 px, clair et sombre)</h1><div class="w">{cols}</div>''')
