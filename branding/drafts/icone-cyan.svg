@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="113" fill="#0a8ca9"/>
+  <g transform="translate(256,256) scale(1.14) translate(-269,-261)">
+  <g transform="translate(300,250) rotate(12)">
+    <rect x="-105" y="-135" width="210" height="270" rx="38" fill="#cdbcff"/>
+  </g>
+  <g transform="translate(232,272) rotate(-6)">
+    <path d="M -74,-142.5 H 54 L 110,-86.5 V 106.5 Q 110,142.5 74,142.5 H -74 Q -110,142.5 -110,106.5 V -106.5 Q -110,-142.5 -74,-142.5 Z" transform="translate(9,11)" fill="#046378" opacity=".28"/>
+    <path d="M -74,-142.5 H 54 L 110,-86.5 V 106.5 Q 110,142.5 74,142.5 H -74 Q -110,142.5 -110,106.5 V -106.5 Q -110,-142.5 -74,-142.5 Z" fill="#fff4d6"/>
+    <path d="M 54,-142.5 L 54,-98 Q 54,-86.5 66,-86.5 L 110,-86.5 Z" fill="#ecd9a6"/>
+    <rect x="-90" y="-3" width="180" height="42" rx="16" fill="#ffe66d"/>
+    <g stroke="#046378" stroke-width="21" stroke-linecap="round" fill="none">
+      <path d="M -68,-84 H 4" stroke-width="27"/>
+      <path d="M -68,-30 H 68"/>
+      <path d="M -68,18 H 58"/>
+      <path d="M -68,66 H 68"/>
+      <path d="M -68,108 H -6"/>
+    </g>
+  </g>
+  </g>
+</svg>
