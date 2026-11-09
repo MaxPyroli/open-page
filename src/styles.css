@@ -15,7 +15,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #17181b;
     --bar: #232529;
     --fg: #e6e8ec;
@@ -25,7 +25,22 @@
   }
 }
 
+:root[data-theme="light"] { color-scheme: light; }
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #17181b;
+  --bar: #232529;
+  --fg: #e6e8ec;
+  --muted: #9aa1ad;
+  --border: #35383e;
+  --accent: #6ea0ff;
+}
+
 * { box-sizing: border-box; }
+
+/* Les `display:` définis plus bas ne doivent pas annuler l'attribut hidden. */
+[hidden] { display: none !important; }
 
 html, body {
   margin: 0;
@@ -72,9 +87,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
 body.mode-html .pdf-only,
 body.mode-none .pdf-only { display: none; }
-body.mode-none #btn-night { display: none; }
 
-#viewer { flex: 1; position: relative; overflow: auto; }
+#viewer { flex: 1; position: relative; overflow: auto; touch-action: pan-x pan-y; overflow-anchor: none; }
 
 #welcome {
   height: 100%;
@@ -87,11 +101,20 @@ body.mode-none #btn-night { display: none; }
 #welcome h1 { color: var(--fg); margin: 0 0 8px; }
 #welcome .hint { font-size: 12px; }
 
-#pages { padding: 16px 0; }
+/* Colonne centrée qui peut dépasser la largeur visible (zoom > ajusté) sans couper la gauche. */
+#pages {
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: max-content;
+  min-width: 100%;
+}
 
 .page {
   position: relative;
-  margin: 0 auto 12px;
+  flex: none;
+  margin: 0 16px 12px;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }

@@ -21,7 +21,7 @@ const els = {
   zoomLabel: $("zoom-label"),
   searchInput: $<HTMLInputElement>("search-input"),
   searchCount: $("search-count"),
-  night: $("btn-night"),
+  theme: $("btn-theme"),
 };
 
 // ---------------------------------------------------------------- état
@@ -153,7 +153,7 @@ async function openPdf(path: string) {
     views.push(v);
     els.pages.appendChild(el);
   }
-  applyScale(computeFitScale());
+  applyScale(computeFitScale(), undefined, 1); // pages encore sans hauteur : on force la page 1
   views.forEach((v) => observer!.observe(v.el));
   void measureAllPages(doc, myLoad);
 }
@@ -194,8 +194,12 @@ function computeFitScale() {
   return Math.max(0.1, (els.viewer.clientWidth - 32) / maxW);
 }
 
-function applyScale(next: number) {
-  const anchor = currentPage();
+interface Anchor { cx: number; cy: number; vx: number; vy: number }
+
+/** Change l'échelle. Avec `anchor`, le point sous le curseur reste en place. */
+function applyScale(next: number, anchor?: Anchor, forcePage?: number) {
+  const page = forcePage ?? currentPage();
+  const old = scale;
   scale = Math.min(5, Math.max(0.1, next));
   els.zoomLabel.textContent = `${Math.round(scale * 100)} %`;
   els.pages.style.setProperty("--total-scale-factor", String(scale));
@@ -204,15 +208,59 @@ function applyScale(next: number) {
     cancelRender(v);
     sizePage(v);
   }
-  views[anchor - 1]?.el.scrollIntoView({ block: "start" });
+  if (anchor) {
+    const r = scale / old;
+    els.viewer.scrollLeft = anchor.cx * r - anchor.vx;
+    els.viewer.scrollTop = anchor.cy * r - anchor.vy;
+  } else {
+    views[page - 1]?.el.scrollIntoView({ block: "start" });
+  }
   // Re-déclenche le rendu des pages visibles.
   observer?.disconnect();
   views.forEach((v) => observer?.observe(v.el));
 }
 
-function zoomBy(factor: number) {
+/**
+ * Zoom fluide centré sur un point (trackpad, pincement, Ctrl+molette).
+ * Pendant le geste on met simplement la zone à l'échelle (CSS, instantané) ;
+ * les pages ne sont re-rendues nettes qu'une fois le geste terminé.
+ */
+let pinch: { factor: number; anchor: Anchor; timer: number } | null = null;
+
+function zoomAt(factor: number, clientX: number, clientY: number, immediate = false) {
+  if (!pdf) return;
   fitWidth = false;
-  applyScale(scale * factor);
+  if (!pinch) {
+    const vr = els.viewer.getBoundingClientRect();
+    const vx = clientX - vr.left;
+    const vy = clientY - vr.top;
+    const cx = els.viewer.scrollLeft + vx;
+    const cy = els.viewer.scrollTop + vy;
+    pinch = { factor: 1, anchor: { cx, cy, vx, vy }, timer: 0 };
+    els.pages.style.transformOrigin = `${cx - els.pages.offsetLeft}px ${cy - els.pages.offsetTop}px`;
+  }
+  pinch.factor = Math.min(5 / scale, Math.max(0.1 / scale, pinch.factor * factor));
+  els.pages.style.transform = `scale(${pinch.factor})`;
+  els.zoomLabel.textContent = `${Math.round(scale * pinch.factor * 100)} %`;
+  window.clearTimeout(pinch.timer);
+  if (immediate) commitZoom();
+  else pinch.timer = window.setTimeout(commitZoom, 140);
+}
+
+function commitZoom() {
+  if (!pinch) return;
+  const p = pinch;
+  pinch = null;
+  window.clearTimeout(p.timer);
+  els.pages.style.transform = "";
+  els.pages.style.transformOrigin = "";
+  applyScale(scale * p.factor, p.anchor);
+}
+
+/** Zoom des boutons / raccourcis : centré sur le milieu de la zone visible. */
+function zoomBy(factor: number) {
+  const r = els.viewer.getBoundingClientRect();
+  zoomAt(factor, r.left + r.width / 2, r.top + r.height / 2, true);
 }
 
 // ---------------------------------------------------------------- rendu paresseux
@@ -421,12 +469,26 @@ els.searchInput.addEventListener("keydown", (e) => {
   }
 });
 
-function setNight(on: boolean) {
-  document.body.classList.toggle("night", on);
-  els.night.setAttribute("aria-pressed", String(on));
-  try { localStorage.setItem("night", on ? "1" : "0"); } catch { /* ignoré */ }
+// Thème : Auto (suit le système) → Clair → Sombre. « Sombre » assombrit aussi les pages.
+type Theme = "auto" | "light" | "dark";
+const THEMES: Theme[] = ["auto", "light", "dark"];
+const THEME_LABEL: Record<Theme, string> = { auto: "Thème : Auto", light: "Thème : Clair", dark: "Thème : Sombre" };
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+let theme: Theme = "auto";
+
+function applyTheme(t: Theme, save = true) {
+  theme = t;
+  const root = document.documentElement;
+  if (t === "auto") root.removeAttribute("data-theme");
+  else root.dataset.theme = t;
+  document.body.classList.toggle("night", t === "dark" || (t === "auto" && systemDark.matches));
+  els.theme.textContent = THEME_LABEL[t];
+  if (save) {
+    try { localStorage.setItem("theme", t); } catch { /* ignoré */ }
+  }
 }
-els.night.addEventListener("click", () => setNight(!document.body.classList.contains("night")));
+els.theme.addEventListener("click", () => applyTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]));
+systemDark.addEventListener("change", () => applyTheme(theme, false));
 
 window.addEventListener("keydown", (e) => {
   const mod = e.ctrlKey || e.metaKey;
@@ -440,8 +502,27 @@ window.addEventListener("keydown", (e) => {
 els.viewer.addEventListener("wheel", (e) => {
   if (!e.ctrlKey || !pdf) return;
   e.preventDefault();
-  zoomBy(e.deltaY < 0 ? 1.1 : 1 / 1.1);
+  // Un cran de molette ≈ ±22 % ; un pincement de trackpad envoie de petits deltas → zoom progressif.
+  const unit = e.deltaMode === 1 ? 33 : 1;
+  zoomAt(Math.exp(-e.deltaY * unit * 0.0025), e.clientX, e.clientY);
 }, { passive: false });
+
+// Pincement tactile à deux doigts.
+let lastPinchDist = 0;
+const touchDist = (t: TouchList) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+els.viewer.addEventListener("touchstart", (e) => {
+  lastPinchDist = e.touches.length === 2 ? touchDist(e.touches) : 0;
+}, { passive: true });
+els.viewer.addEventListener("touchmove", (e) => {
+  if (e.touches.length !== 2 || !pdf) return;
+  e.preventDefault();
+  const d = touchDist(e.touches);
+  if (lastPinchDist > 0) {
+    zoomAt(d / lastPinchDist, (e.touches[0].clientX + e.touches[1].clientX) / 2, (e.touches[0].clientY + e.touches[1].clientY) / 2);
+  }
+  lastPinchDist = d;
+}, { passive: false });
+els.viewer.addEventListener("touchend", () => { lastPinchDist = 0; }, { passive: true });
 
 let resizeTimer = 0;
 window.addEventListener("resize", () => {
@@ -453,7 +534,9 @@ window.addEventListener("resize", () => {
 
 window.addEventListener("DOMContentLoaded", async () => {
   setMode("none");
-  try { setNight(localStorage.getItem("night") === "1"); } catch { /* ignoré */ }
+  let saved: string | null = null;
+  try { saved = localStorage.getItem("theme"); } catch { /* ignoré */ }
+  applyTheme(THEMES.includes(saved as Theme) ? (saved as Theme) : "auto", false);
 
   await getCurrentWebview().onDragDropEvent((event) => {
     const p = event.payload;
