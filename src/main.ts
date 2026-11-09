@@ -2,6 +2,7 @@ import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { getVersion } from "@tauri-apps/api/app";
 import * as pdfjs from "pdfjs-dist";
 import type { PDFDocumentLoadingTask, PDFDocumentProxy, PDFPageProxy, RenderTask } from "pdfjs-dist";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
@@ -79,7 +80,7 @@ async function openPath(path: string) {
       showError("Format non pris en charge (PDF ou HTML uniquement).");
       return;
     }
-    await getCurrentWindow().setTitle(`${fileName(path)} – Liseuse`);
+    await getCurrentWindow().setTitle(`${fileName(path)} – Open Page`);
   } catch (e) {
     showError(`Impossible d'ouvrir ${fileName(path)} : ${String((e as Error)?.message ?? e)}`);
   }
@@ -539,6 +540,29 @@ window.addEventListener("resize", () => {
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => { if (fitWidth && views.length) applyScale(computeFitScale()); }, 120);
 });
+
+// ---------------------------------------------------------------- à propos
+
+const about = $<HTMLDialogElement>("about");
+const privacyFrame = $<HTMLIFrameElement>("privacy-frame");
+const aboutMain = $("about-main");
+const privacyBtn = $("btn-privacy");
+
+function showPrivacy(on: boolean) {
+  privacyFrame.hidden = !on;
+  aboutMain.hidden = on;
+  if (on) privacyFrame.src = "/confidentialite.html";
+  privacyBtn.textContent = on ? "Retour" : "Confidentialité";
+}
+
+$("btn-about").addEventListener("click", async () => {
+  showPrivacy(false);
+  try { $("about-version").textContent = `Version ${await getVersion()}`; } catch { /* hors Tauri */ }
+  about.showModal();
+});
+privacyBtn.addEventListener("click", () => showPrivacy(Boolean(privacyFrame.hidden)));
+$("btn-about-close").addEventListener("click", () => about.close());
+about.addEventListener("click", (e) => { if (e.target === about) about.close(); });
 
 // ---------------------------------------------------------------- démarrage
 

@@ -44,5 +44,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: liseuse-${{ matrix.name }}
+          name: open-page-${{ matrix.name }}
           path: src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*.exe

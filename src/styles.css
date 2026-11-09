@@ -134,6 +134,26 @@ body.night .page { background: #111; }
   display: block;
 }
 
+dialog#about {
+  width: min(520px, 92vw);
+  max-height: 88vh;
+  padding: 24px;
+  color: var(--fg);
+  background: var(--bar);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+dialog#about::backdrop { background: rgba(0, 0, 0, 0.45); }
+#about-main { text-align: center; }
+#about-main img { border-radius: 16px; }
+#about-main h2 { margin: 8px 0 0; }
+#about-main p { margin: 8px 0; }
+.muted { color: var(--muted); font-size: 13px; }
+#privacy-frame { width: 100%; height: 55vh; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); }
+dialog#about .actions { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
+dialog#about button { border-radius: 999px; }
+
 #error {
   position: fixed;
   left: 50%;

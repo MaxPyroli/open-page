@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="/src/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Liseuse</title>
+    <meta name="author" content="Paname Dev" />
+    <title>Open Page</title>
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
@@ -32,17 +33,35 @@
         <button id="btn-search-next" title="Résultat suivant">↓</button>
       </div>
       <button id="btn-theme" title="Changer de thème : automatique (système), clair ou sombre">Thème : Auto</button>
+      <button id="btn-about" title="À propos d'Open Page">À propos</button>
     </header>
 
     <main id="viewer">
       <div id="welcome">
-        <h1>Liseuse</h1>
+        <h1>Open Page</h1>
         <p>Glisse un fichier <strong>PDF</strong> ou <strong>HTML</strong> ici,<br />ou clique sur « Ouvrir ».</p>
         <p class="hint">Tout reste sur ton ordinateur, rien n'est envoyé nulle part.</p>
       </div>
       <div id="pages" hidden></div>
       <iframe id="html-frame" hidden sandbox="allow-same-origin" title="Document HTML"></iframe>
     </main>
+
+    <dialog id="about" aria-labelledby="about-title">
+      <div id="about-main">
+        <img src="/logo.png" width="72" height="72" alt="" />
+        <h2 id="about-title">Open Page</h2>
+        <p id="about-version" class="muted"></p>
+        <p>Lis et annote des PDF, lis des pages HTML. Tout reste sur ton ordinateur.</p>
+        <p><strong>Sans pub, sans pistage.</strong></p>
+        <p class="muted">© 2026 Paname Dev · Pensé par Paname Dev et codé par Claude</p>
+        <p class="muted">contact@panamedev.fr</p>
+      </div>
+      <iframe id="privacy-frame" title="Confidentialité" hidden></iframe>
+      <div class="actions">
+        <button id="btn-privacy">Confidentialité</button>
+        <button id="btn-about-close">Fermer</button>
+      </div>
+    </dialog>
 
     <div id="error" role="alert" hidden></div>
   </body>
