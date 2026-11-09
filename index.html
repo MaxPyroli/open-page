@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Liseuse</title>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <header id="toolbar">
+      <button id="btn-open" title="Ouvrir (Ctrl+O)">Ouvrir</button>
+      <span class="sep pdf-only"></span>
+      <div class="group pdf-only">
+        <button id="btn-prev" title="Page précédente">‹</button>
+        <input id="page-input" type="number" min="1" value="1" aria-label="Page" />
+        <span id="page-total">/ –</span>
+        <button id="btn-next" title="Page suivante">›</button>
+      </div>
+      <span class="sep pdf-only"></span>
+      <div class="group pdf-only">
+        <button id="btn-zoom-out" title="Zoom arrière (Ctrl+-)">−</button>
+        <span id="zoom-label">100 %</span>
+        <button id="btn-zoom-in" title="Zoom avant (Ctrl++)">+</button>
+        <button id="btn-fit" title="Ajuster à la largeur (Ctrl+0)">Largeur</button>
+      </div>
+      <span class="spacer"></span>
+      <div class="group pdf-only" id="search-group">
+        <input id="search-input" type="search" placeholder="Rechercher (Ctrl+F)" />
+        <span id="search-count"></span>
+        <button id="btn-search-prev" title="Résultat précédent">↑</button>
+        <button id="btn-search-next" title="Résultat suivant">↓</button>
+      </div>
+      <button id="btn-night" title="Mode nuit pour les pages (inverse les couleurs)">Nuit</button>
+    </header>
+
+    <main id="viewer">
+      <div id="welcome">
+        <h1>Liseuse</h1>
+        <p>Glisse un fichier <strong>PDF</strong> ou <strong>HTML</strong> ici,<br />ou clique sur « Ouvrir ».</p>
+        <p class="hint">Tout reste sur ton ordinateur, rien n'est envoyé nulle part.</p>
+      </div>
+      <div id="pages" hidden></div>
+      <iframe id="html-frame" hidden sandbox="allow-same-origin" title="Document HTML"></iframe>
+    </main>
+
+    <div id="error" role="alert" hidden></div>
+  </body>
+</html>

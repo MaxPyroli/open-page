@@ -1,0 +1,48 @@
+name: Build Windows
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-arm64
+            runner: windows-11-arm
+            target: aarch64-pc-windows-msvc
+          - name: windows-x64
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.runner }}
+    name: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+      - run: npm run build
+
+      # NSIS uniquement : le MSI (WiX) n'est pas fiable sur ARM64.
+      - run: npx tauri build --target ${{ matrix.target }} --bundles nsis
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: liseuse-${{ matrix.name }}
+          path: src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*.exe
