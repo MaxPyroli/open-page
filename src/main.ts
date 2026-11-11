@@ -454,6 +454,7 @@ function highlightPage(v: PageView) {
 // ---------------------------------------------------------------- événements UI
 
 $("btn-open").addEventListener("click", chooseFile);
+$("btn-open-welcome").addEventListener("click", chooseFile);
 $("btn-prev").addEventListener("click", () => goToPage(currentPage() - 1));
 $("btn-next").addEventListener("click", () => goToPage(currentPage() + 1));
 els.pageInput.addEventListener("change", () => goToPage(Number(els.pageInput.value) || 1));

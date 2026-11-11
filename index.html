@@ -38,9 +38,13 @@
 
     <main id="viewer">
       <div id="welcome">
+        <img class="logo" src="/logo.png" width="112" height="112" alt="" />
         <h1>Open Page</h1>
-        <p>Glisse un fichier <strong>PDF</strong> ou <strong>HTML</strong> ici,<br />ou clique sur « Ouvrir ».</p>
-        <p class="hint">Tout reste sur ton ordinateur, rien n'est envoyé nulle part.</p>
+        <p class="tagline">Lis et annote tes PDF. Lis tes pages HTML.</p>
+        <button id="btn-open-welcome" class="primary">Ouvrir un fichier</button>
+        <p class="drop">ou glisse-le ici</p>
+        <div class="chips"><span>PDF</span><span>HTML</span></div>
+        <p class="hint">Sans pub, sans pistage. Tout reste sur ton ordinateur.</p>
       </div>
       <div id="pages" hidden></div>
       <iframe id="html-frame" hidden sandbox="allow-same-origin" title="Document HTML"></iframe>

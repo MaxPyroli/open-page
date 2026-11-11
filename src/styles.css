@@ -92,14 +92,53 @@ body.mode-none .pdf-only { display: none; }
 
 #welcome {
   height: 100%;
-  display: grid;
-  place-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  gap: 4px;
+  gap: 6px;
+  padding: 24px;
   color: var(--muted);
 }
-#welcome h1 { color: var(--fg); margin: 0 0 8px; }
-#welcome .hint { font-size: 12px; }
+#welcome > * { animation: rise 420ms cubic-bezier(.2, .8, .2, 1) both; }
+#welcome > :nth-child(2) { animation-delay: 60ms; }
+#welcome > :nth-child(3) { animation-delay: 120ms; }
+#welcome > :nth-child(4) { animation-delay: 180ms; }
+#welcome > :nth-child(5) { animation-delay: 220ms; }
+#welcome > :nth-child(6) { animation-delay: 260ms; }
+#welcome > :nth-child(7) { animation-delay: 300ms; }
+@keyframes rise { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+@media (prefers-reduced-motion: reduce) { #welcome > * { animation: none; } }
+
+#welcome .logo {
+  border-radius: 25px;
+  margin-bottom: 10px;
+  box-shadow: 0 14px 34px rgba(10, 140, 169, 0.35), 0 3px 8px rgba(0, 0, 0, 0.18);
+}
+#welcome h1 { color: var(--fg); margin: 0; font-size: 30px; letter-spacing: -0.02em; }
+#welcome .tagline { margin: 0 0 14px; font-size: 15px; }
+#welcome .drop { margin: 6px 0 0; font-size: 13px; }
+#welcome .hint { margin: 18px 0 0; font-size: 12px; }
+#welcome .chips { display: flex; gap: 6px; margin-top: 4px; }
+#welcome .chips span {
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 999px;
+}
+button.primary {
+  padding: 9px 22px;
+  font-weight: 600;
+  color: #0b1f26; /* texte sombre sur le cyan : contraste 4,5:1 (charte) */
+  background: var(--accent);
+  border-color: var(--accent);
+  border-radius: 999px;
+  transition: translate 250ms cubic-bezier(.2, .8, .2, 1), filter 250ms;
+}
+button.primary:hover:not(:disabled) { translate: 0 -2px; filter: brightness(1.08); }
 
 /* Colonne centrée qui peut dépasser la largeur visible (zoom > ajusté) sans couper la gauche. */
 #pages {
